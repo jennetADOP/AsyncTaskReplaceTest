@@ -63,6 +63,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        corountineButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Coroutine coroutine = new Coroutine(progressBar, url, titleTextView);
+            }
+        });
+
     }
 
     public void init() {
@@ -147,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                     rxBackgroundTask.dispose();
                 });
     }
+
 
 
 
