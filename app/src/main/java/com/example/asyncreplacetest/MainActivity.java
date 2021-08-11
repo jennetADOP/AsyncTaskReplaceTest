@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     String title;
 
     Disposable rxBackgroundTask;
-
+    String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,12 +46,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         init();
+        url = "https://www.yna.co.kr/view/AKR20210811064300004";
 
         asyncButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SomethingAsync somethingAsync = new SomethingAsync(progressBar);
+                SomethingAsync somethingAsync = new SomethingAsync(progressBar, url);
                 somethingAsync.execute();
+            }
+        });
+
+        rxJavaButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                RxJavaBackgroundTask(url);
             }
         });
 
@@ -59,21 +67,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void init() {
 
-        progressBar.findViewById(R.id.progressBar);
-        asyncButton.findViewById(R.id.asyncButton);
-        rxJavaButton.findViewById(R.id.rxJavaButton);
-        corountineButton.findViewById(R.id.corountineButton);
-        titleTextView.findViewById(R.id.titleTextView);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        asyncButton = (AppCompatButton) findViewById(R.id.asyncButton);
+        rxJavaButton = (AppCompatButton) findViewById(R.id.rxJavaButton);
+        corountineButton= (AppCompatButton) findViewById(R.id.corountineButton);
+        titleTextView = (TextView) findViewById(R.id.titleTextView);
     }
 
 
     public class SomethingAsync extends AsyncTask<Void, Integer, String> {
 
         ProgressBar progressBar;
+        String url;
 
 
-        public SomethingAsync(ProgressBar progressBar) {
+        public SomethingAsync(ProgressBar progressBar, String url) {
             this.progressBar = progressBar;
+            this.url = url;
         }
 
         @Override
@@ -88,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
             Document document = null;
 
             try {
-                document = Jsoup.connect(URL).timeout(3000).get();
+                document = Jsoup.connect(url).timeout(3000).get();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -120,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         rxBackgroundTask = Observable.fromCallable(() -> {
         //doInBackground
             title ="";
-            Document document = Jsoup.connect(URLs).timeout(3000).get();
+            Document document = Jsoup.connect(url).timeout(3000).get();
             Elements elements = document.select("title");
             title = elements.get(0).text();
             Log.d("로그 doInBackground", title);
@@ -133,10 +143,12 @@ public class MainActivity extends AppCompatActivity {
                     //onPostExcute
                     titleTextView.setVisibility(View.VISIBLE);
                     titleTextView.setText(title);
-
+                    progressBar.setVisibility(View.GONE);
                     rxBackgroundTask.dispose();
                 });
     }
+
+
 
 
 }
